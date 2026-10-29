@@ -1,6 +1,6 @@
 {
-  "name": "Atmosphere",
-  "description": "Clean minimalist weather dashboard with 5-day forecast, multi-provider weather APIs, GPS location, favorites drawer, and tablet mode.",
+  "name": "Lloyds Weather",
+  "description": "Lloyds Weather - Clean minimalist weather dashboard with 5-day forecast, F-Droid FOSS and Google editions, pure GPS location, and favorites drawer.",
   "requestFramePermissions": [],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
 }

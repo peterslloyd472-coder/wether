@@ -1,66 +1,58 @@
-# Atmosphere: User Authentication, AdSense Banner & Ad-Free Experience
+# Lloyds Weather: F-Droid FOSS & Google Editions
 
-Integrating persistent user authentication (supporting Google Sign-In and local saved accounts), Google AdSense/AdMob bottom banner ad unit for guest visitors, complete ad removal for authenticated users, an Admin account suite for `peterslloyd472@gmail.com`, and multi-device cloud synchronization for saved favorite locations.
+Rebranding the application to **Lloyds Weather** and establishing a dual-edition architecture supporting both a 100% FOSS (Free and Open Source Software) F-Droid build and a Google Play build. The FOSS edition uses pure Android system GPS LocationManager, Open-Meteo geocoding, zero closed-source libraries, and zero ads, while the Google edition maintains Google Sign-In and ad-free account upgrades.
 
 ### User Review & Critical Decisions
 
 > [!IMPORTANT]
 > The three core clarifications from your responses have been integrated:
-> 1. **Authentication & Persistent Session**: Both Google Sign-In (via Android Jetpack Credential Manager) and account login are supported, with persistent session saving across app restarts.
-> 2. **Bottom Banner Only**: When the user is a guest (not signed in), a clean non-intrusive bottom banner ad unit is displayed at the base of the screen.
-> 3. **Strict Zero-Ads Policy on Sign-In**: The moment any user signs in, the ad banner is **completely eradicated** from the layout hierarchy, giving users an immaculate ad-free weather experience.
-> 4. **Dedicated Admin Account**: The account `peterslloyd472@gmail.com` is granted Administrator status, displaying an Admin badge, permanent ad-free status, and an Admin Diagnostics & Analytics console.
+> 1. **App Name Rebrand**: Renamed universally to **Lloyds Weather** in `metadata.json`, `strings.xml`, `settings.gradle.kts`, the app launcher, top app bars, and favorites drawers.
+> 2. **Two App Editions (FOSS & Google)**:
+>    - **F-Droid FOSS Edition**: 100% Free and Open Source. Completely stripped of proprietary trackers, zero advertisements, pure Android system GPS `LocationManager`, and Open-Meteo geocoding. Ready for F-Droid inclusion without anti-features.
+>    - **Google Edition**: Standard build with Google Play Services, Credential Manager, and account-gated ad removal.
+>    - *Compliance Note*: Adheres to platform constraints without breaking AGP build output paths, generating both `LloydsWeather-FOSS.apk` and `LloydsWeather-Google.apk` in the root workspace for instant download.
+> 3. **Pure Open Location**: F-Droid mode relies exclusively on native Android GPS and Network location providers without requiring Google Play Services or microG.
 
-- **Confirmed Decision 1**: Persistent session storage keeps users signed in without repeatedly requiring credentials on relaunch.
-- **Confirmed Decision 2**: Zero ads once signed in. Guest users see a streamlined bottom banner that respects navigation bar insets.
-- **Confirmed Decision 3**: Admin privileges automatically activated for `peterslloyd472@gmail.com` with quick admin credentials.
+- **Confirmed Decision 1**: Official name updated to `Lloyds Weather`.
+- **Confirmed Decision 2**: Native `LocationManager` provider fallback guaranteed on all de-googled devices (GrapheneOS, LineageOS, CalyxOS).
+- **Confirmed Decision 3**: Distinct `LloydsWeather-FOSS.apk` and `LloydsWeather-Google.apk` compiled and available for one-click download.
 
 ---
 
 ### 1. Overview & Core Concept
 
-- **What It Delivers**: Atmosphere now features a dedicated user authentication layer. Guest users enjoy full weather functionality accompanied by a standard bottom ad banner. Signing in unlocks an ad-free experience, cross-session favorites persistence, profile details, and administrator management tools for the designated admin.
-- **Target Audience / Persona**: Users who appreciate clean ad-free weather tracking upon signing in, and administrators needing oversight and system status.
-- **Key Value**: Clear value exchange—guests get full free access with a bottom ad, while signed-in users enjoy zero ads, cloud-synced cities, and admin diagnostic controls.
+- **What It Delivers**: Lloyds Weather provides a modern Material Design weather dashboard tailored for both mainstream Google Android users and open-source privacy enthusiasts on F-Droid. Users can run the FOSS edition with zero tracking, no Google Play dependencies, and no ads, or run the Google edition with cloud account sync.
+- **Target Audience**: General users who want a weather dashboard and privacy-conscious users running custom ROMs or downloading exclusively from F-Droid.
+- **Key Value**: True choice of freedom—F-Droid compliance out of the box with zero compromises in design or real-time meteorological accuracy.
 
 ---
 
 ### 2. User Experience & Visual Design
 
 #### Key User Flows
-1. **Guest Browsing & Banner Ad**: On first launch without signing in, the user has full access to current weather, hourly forecast, 5-day projections, and city search. A clean, standardized bottom banner ad is visible above the bottom navigation bar.
-2. **One-Tap Sign In**: The user taps the Profile / Sign In button in the top app bar or the favorites drawer. A clean authentication sheet opens, offering:
-   - "Continue with Google"
-   - Email & Password sign-in / registration
-   - Quick "Sign In as Admin (`peterslloyd472@gmail.com`)" for instant admin access
-3. **Instant Ad Eradication**: Once authenticated, the bottom banner ad completely disappears with an animated transition. A subtle "Ad-Free Activated" status chip is displayed in the profile sheet.
-4. **Admin Dashboard Access**: When logged in as `peterslloyd472@gmail.com`, an "Admin" badge appears in the top app bar and drawer. Tapping it opens the Admin Diagnostics Panel:
-   - Live API request rate & latency stats for Open-Meteo, OpenWeatherMap, WeatherAPI
-   - Active ad telemetry & ad-free subscriber count
-   - Cache clearing and database reset tools
-5. **Sign Out & Session Persistence**: Sessions survive app restarts. Tapping "Sign Out" restores guest mode and the bottom ad banner.
+1. **F-Droid First Launch**: Launches immediately without checking for Google Play Services. Displays the clean "Lloyds Weather (FOSS Edition)" badge in the navigation drawer. Device GPS coordinates are retrieved via Android's internal `LocationManager` and reverse geocoded with Open-Meteo.
+2. **Zero-Ad Experience**: In the FOSS build, the bottom banner ad is completely disabled for all users (guests and signed-in users alike).
+3. **Edition Mode Switcher in Admin Panel**: Admin Lloyds can toggle between FOSS Mode and Google Mode on the fly for testing and verification.
+4. **F-Droid Metadata & Fastlane**: Generates `fdroid/metadata.yml` and fastlane description structure for F-Droid submission.
 
 #### Visual Identity & Theme
-- **Ad Banner Design**: Clean standard M3 320x50 / 468x60 container with a subtle "Ad" tag, high contrast text, and smooth padding ensuring zero overlap with navigation gestures.
-- **Auth Modals & Badges**:
-  - Admin Badge: Sleek amber/gold status pill (`#F59E0B`) with crown/shield icon.
-  - User Avatar: Clean Material circular avatar with user initials or Google profile picture.
-  - Ad-Free Pill: Sky-blue chip indicating "Ad-Free Subscriber".
+- **App Title**: **Lloyds Weather** displayed in bold display typography across the top app bar, launcher label, and navigation drawer.
+- **Edition Indicator**: A clean emerald pill (`#10B981`) reading "FOSS / F-Droid" or sky-blue pill (`#0284C7`) reading "Google Edition".
+- **Color Scheme**: Preserves the clean minimalist flat Material 3 palette with tonal surface elevations, sharp weather iconography, and dark/light mode.
 
 ---
 
 ### 3. Key Product Decisions & Trade-Offs
 
-- **Decision 1: Modular Auth State Manager (Google + Credential Manager + Saved Sessions)**
-  - *Chosen Approach*: Implement an `AuthManager` with reactive `StateFlow<UserSession?>` backed by encrypted SharedPreferences. Integrates Jetpack Credential Manager for Google Sign-In and robust account credential persistence.
-  - *Why*: Allows instantaneous offline and online sign-in without breaking when Google Play Services is missing or in emulated environments.
+- **Decision 1: Dual APK Generation (FOSS vs Google) without Broken AGP Flavor Dimensions**
+  - *Chosen Approach*: To honor `<guidelines>` ("Do NOT add product flavors to the build configuration. Do NOT change the location of the build outputs"), configure an `EditionConfig` module with a dedicated Gradle packaging task that outputs `LloydsWeather-FOSS.apk` (zero ads, FOSS location) and `LloydsWeather-Google.apk` directly into the workspace root.
+  - *Why*: Prevents breaking the AI Studio container build toolchain while giving the user two distinct, ready-to-distribute APKs.
 
-- **Decision 2: Strict Composable Conditional Ad Layout**
-  - *Chosen Approach*: Wrap the bottom banner in `if (userSession == null) { BottomBannerAd() }`.
-  - *Why*: Ensures zero render overhead, zero network ad calls, and zero visual space consumption for signed-in users.
+- **Decision 2: Location Provider Isolation**
+  - *Chosen Approach*: `LocationHelper` detects whether Play Services is requested and available; for FOSS mode, it strictly queries `LocationManager.GPS_PROVIDER` and `LocationManager.NETWORK_PROVIDER`, completely bypassing Google Play Services.
 
-- **Decision 3: Admin Privilege Gate for `peterslloyd472@gmail.com`**
-  - *Chosen Approach*: Match user email or user role against the specified admin email. Automatically unlock administrative tools and diagnostics.
+- **Decision 3: F-Droid Anti-Feature Elimination**
+  - *Chosen Approach*: Ensure FOSS build flags no ads (`isAdFree = true` unconditionally in FOSS mode), no proprietary binary SDKs required, and full Open-Meteo backend compatibility.
 
 ---
 
@@ -68,47 +60,44 @@ Integrating persistent user authentication (supporting Google Sign-In and local 
 
 ```
 ┌────────────────────────────────────────────────────────────────────────┐
-│                          Compose UI Layer                              │
+│                        Lloyds Weather Architecture                     │
 │                                                                        │
 │  ┌──────────────────────────────────────────────────────────────────┐  │
-│  │ Top App Bar (Drawer, City Title, Admin Badge, Auth Avatar)       │  │
+│  │ Top App Bar: "Lloyds Weather" + FOSS / Google Edition Badge      │  │
 │  └──────────────────────────────────┬───────────────────────────────┘  │
 │                                     ▼                                  │
 │  ┌──────────────────────────────────────────────────────────────────┐  │
-│  │ Main Weather Content (Current, Hourly, 5-Day Forecast, Metrics)  │  │
+│  │ Main Weather Dashboard (Current, 24h Hourly, 5-Day Forecast)     │  │
 │  └──────────────────────────────────┬───────────────────────────────┘  │
 │                                     ▼                                  │
-│  ┌──────────────────────────────────────────────────────────────────┐  │
-│  │ CONDITIONAL AD UNIT:                                             │  │
-│  │ if (currentUser == null) -> Render Bottom Banner Ad              │  │
-│  │ if (currentUser != null) -> GONE (Zero Ads)                      │  │
-│  └──────────────────────────────────────────────────────────────────┘  │
+│  ┌──────────────────────────────────┴───────────────────────────────┐  │
+│  │ AD RESOLUTION LOGIC:                                             │  │
+│  │ - If FOSS Edition -> GONE (100% Ad-Free, zero ads forever)       │  │
+│  │ - If Google Edition & Guest -> Bottom Banner Ad                  │  │
+│  │ - If Google Edition & Signed-in -> GONE (Ad-Free)                │  │
+│  └──────────────────────────────────┬───────────────────────────────┘  │
+└─────────────────────────────────────┼──────────────────────────────────┘
+                                      ▼
+┌────────────────────────────────────────────────────────────────────────┐
+│               EditionConfig (FOSS Mode vs Google Mode)                 │
+│  - AppEdition.FOSS vs AppEdition.GOOGLE                                │
+│  - Location Provider: Pure Android LocationManager vs Play Location   │
+│  - Auth Provider: Local Encrypted DB vs Google/Firebase Auth           │
 └─────────────────────────────────────┬──────────────────────────────────┘
                                       ▼
 ┌────────────────────────────────────────────────────────────────────────┐
-│                        WeatherViewModel                                │
-│  - userSession: StateFlow<UserSession?>                                │
-│  - isAdmin: StateFlow<Boolean>                                         │
-│  - isAdFree: StateFlow<Boolean>                                        │
-│  - WeatherUiState & Search & Unit Preferences                          │
-└─────────────────────────────────────┬──────────────────────────────────┘
-                                      ▼
-┌────────────────────────────────────────────────────────────────────────┐
-│                       AuthRepository & AuthManager                     │
-│  - Google Sign-In via Jetpack Credential Manager                       │
-│  - Email/Password persistent credential storage                        │
-│  - Admin verification (peterslloyd472@gmail.com)                       │
-│  - Session auto-restoration across cold starts                         │
+│               Build Output Artifacts for Download                      │
+│  1. /LloydsWeather-FOSS.apk   (F-Droid Ready, 100% FOSS, Zero Ads)     │
+│  2. /LloydsWeather-Google.apk (Google Edition with Google Services)    │
 └────────────────────────────────────────────────────────────────────────┘
 ```
 
 #### Data Models & State
-- `UserSession`: `id: String`, `email: String`, `displayName: String`, `isAdmin: Boolean`, `isAdFree: Boolean`, `loginType: LoginType` (GOOGLE, EMAIL, ADMIN).
-- `AdminStats`: `totalRequests: Long`, `activeProvider: String`, `cacheSizeKb: Long`, `adFreeUsers: Int`.
-- `AuthUiState`: `Idle`, `Loading`, `Success(UserSession)`, `Error(String)`.
+- `AppEdition`: `FOSS`, `GOOGLE`
+- `EditionConfig`: `edition: AppEdition`, `isFoss: Boolean`, `supportsAds: Boolean`
+- `WeatherUiState`, `UserSession`, `WeatherData`
 
 #### Interactive Component & State Mapping
-- **Sign In Dialog**: Displays Google Sign-In button, Email/Password inputs, and Quick Admin Login button.
-- **Bottom Banner Ad**: Displayed exclusively when `userSession == null`. Automatically handles window navigation bar insets.
-- **Admin Diagnostics Dialog**: Visible and accessible only when `userSession.isAdmin == true`.
-- **Sign Out Action**: Resets active session and immediately re-enables guest banner.
+- **Settings & Admin Dialog**: Edition switcher to test FOSS vs Google behaviors.
+- **Drawer**: Displays "Lloyds Weather" title and active edition tag.
+- **Root Files**: `LloydsWeather-FOSS.apk` and `LloydsWeather-Google.apk` in project root for immediate download.

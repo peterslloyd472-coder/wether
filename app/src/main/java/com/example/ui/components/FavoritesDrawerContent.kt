@@ -44,6 +44,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.data.local.FavoriteCityEntity
+import com.example.model.AppEdition
 import com.example.model.UserSession
 import com.example.model.WeatherProvider
 
@@ -51,6 +52,7 @@ import com.example.model.WeatherProvider
 fun FavoritesDrawerContent(
     favorites: List<FavoriteCityEntity>,
     activeProvider: WeatherProvider,
+    appEdition: AppEdition = AppEdition.FOSS,
     userSession: UserSession?,
     onOpenAuthOrProfile: () -> Unit,
     onOpenAdminPanel: () -> Unit,
@@ -96,13 +98,29 @@ fun FavoritesDrawerContent(
                 }
                 Spacer(modifier = Modifier.width(12.dp))
                 Column {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Text(
+                            text = "Lloyds Weather",
+                            style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold),
+                            color = MaterialTheme.colorScheme.onSurface
+                        )
+                        Spacer(modifier = Modifier.width(6.dp))
+                        Box(
+                            modifier = Modifier
+                                .clip(RoundedCornerShape(6.dp))
+                                .background(if (appEdition.isFoss) Color(0xFFD1FAE5) else Color(0xFFE0F2FE))
+                                .padding(horizontal = 6.dp, vertical = 2.dp)
+                        ) {
+                            Text(
+                                text = if (appEdition.isFoss) "FOSS" else "GOOGLE",
+                                fontSize = 9.sp,
+                                fontWeight = FontWeight.Black,
+                                color = if (appEdition.isFoss) Color(0xFF059669) else Color(0xFF0284C7)
+                            )
+                        }
+                    }
                     Text(
-                        text = "Atmosphere",
-                        style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold),
-                        color = MaterialTheme.colorScheme.onSurface
-                    )
-                    Text(
-                        text = activeProvider.displayName.substringBefore(" ("),
+                        text = "${activeProvider.displayName.substringBefore(" (")} • ${if (appEdition.isFoss) "F-Droid" else "Play Store"}",
                         style = MaterialTheme.typography.labelSmall,
                         color = MaterialTheme.colorScheme.secondary
                     )

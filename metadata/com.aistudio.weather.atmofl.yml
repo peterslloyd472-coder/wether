@@ -1,0 +1,30 @@
+Categories:
+  - Weather
+  - Navigation
+License: Apache-2.0
+AuthorName: Lloyds Weather
+AuthorEmail: peterslloyd472@gmail.com
+SourceCode: https://github.com/example/lloyds-weather
+IssueTracker: https://github.com/example/lloyds-weather/issues
+
+AutoName: Lloyds Weather
+Summary: Minimalist, ad-free weather dashboard with Open-Meteo forecasts and native GPS
+Description: |-
+  Lloyds Weather is an open-source Android weather application featuring:
+  * Accurate hourly and 5-day weather forecasts powered by Open-Meteo
+  * Pure device GPS geocoding via Android LocationManager (no Google Play Services required)
+  * Clean, edge-to-edge Material Design 3 user interface
+  * Celsius and Fahrenheit instant conversion
+  * Adaptive layout supporting phones and tablets
+  * Zero ads, zero tracking, and complete privacy
+
+RepoType: git
+Repo: https://github.com/example/lloyds-weather.git
+
+Builds:
+  - versionName: 1.0.0
+    versionCode: 1
+    commit: v1.0.0
+    subdir: app
+    gradle:
+      - yes

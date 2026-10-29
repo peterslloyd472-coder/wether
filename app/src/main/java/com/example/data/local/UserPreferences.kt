@@ -2,6 +2,7 @@ package com.example.data.local
 
 import android.content.Context
 import android.content.SharedPreferences
+import com.example.model.AppEdition
 import com.example.model.TemperatureUnit
 import com.example.model.ThemeMode
 import com.example.model.WeatherProvider
@@ -12,6 +13,9 @@ import kotlinx.coroutines.flow.asStateFlow
 class UserPreferences(context: Context) {
     private val prefs: SharedPreferences = context.getSharedPreferences("atmosphere_prefs", Context.MODE_PRIVATE)
 
+    private val _editionFlow = MutableStateFlow(loadEdition())
+    val editionFlow: StateFlow<AppEdition> = _editionFlow.asStateFlow()
+
     private val _unitFlow = MutableStateFlow(loadUnit())
     val unitFlow: StateFlow<TemperatureUnit> = _unitFlow.asStateFlow()
 
@@ -20,6 +24,20 @@ class UserPreferences(context: Context) {
 
     private val _providerFlow = MutableStateFlow(loadProvider())
     val providerFlow: StateFlow<WeatherProvider> = _providerFlow.asStateFlow()
+
+    private fun loadEdition(): AppEdition {
+        val name = prefs.getString("app_edition", AppEdition.FOSS.name)
+        return try {
+            AppEdition.valueOf(name ?: AppEdition.FOSS.name)
+        } catch (_: Exception) {
+            AppEdition.FOSS
+        }
+    }
+
+    fun setEdition(edition: AppEdition) {
+        prefs.edit().putString("app_edition", edition.name).apply()
+        _editionFlow.value = edition
+    }
 
     private fun loadUnit(): TemperatureUnit {
         val name = prefs.getString("temp_unit", TemperatureUnit.CELSIUS.name)

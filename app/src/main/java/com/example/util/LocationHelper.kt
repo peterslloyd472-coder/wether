@@ -42,14 +42,16 @@ object LocationHelper {
     }
 
     @SuppressLint("MissingPermission")
-    suspend fun getCurrentLocation(context: Context): DeviceLocation? = withContext(Dispatchers.IO) {
+    suspend fun getCurrentLocation(context: Context, isFossEdition: Boolean = false): DeviceLocation? = withContext(Dispatchers.IO) {
         if (!hasLocationPermission(context)) return@withContext null
 
         var location: Location? = null
 
-        // 1. Try Google Play Services FusedLocationProviderClient
-        try {
-            val fusedClient = LocationServices.getFusedLocationProviderClient(context)
+        // In FOSS Edition, strictly use Android System LocationManager (Zero Google Play Services)
+        if (!isFossEdition) {
+            // 1. Try Google Play Services FusedLocationProviderClient for Google Edition
+            try {
+                val fusedClient = LocationServices.getFusedLocationProviderClient(context)
             location = suspendCancellableCoroutine { continuation ->
                 val cts = CancellationTokenSource()
                 fusedClient.getCurrentLocation(Priority.PRIORITY_BALANCED_POWER_ACCURACY, cts.token)
@@ -76,8 +78,9 @@ object LocationHelper {
         } catch (_: Exception) {
             // Ignore and fall back to LocationManager
         }
+        }
 
-        // 2. Fallback to Android System LocationManager if FusedClient was null
+        // 2. Fallback to Android System LocationManager if FusedClient was null or in FOSS mode
         if (location == null) {
             try {
                 val locationManager = context.getSystemService(Context.LOCATION_SERVICE) as? LocationManager

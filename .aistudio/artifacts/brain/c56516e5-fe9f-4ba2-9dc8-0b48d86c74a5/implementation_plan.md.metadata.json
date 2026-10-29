@@ -1,6 +1,6 @@
 {
-  "summary":  "Implementation plan for adding user authentication (Google Sign-In & persistent email account login), Google AdSense/AdMob bottom banner for guest users, ad-free experience for signed-in users, admin account privileges for peterslloyd472@gmail.com, and cloud favorite synchronization.",
-  "updatedAt":  "2026-10-29T19:05:10.656212037Z",
+  "summary":  "Implementation plan for renaming the application to 'Lloyds Weather', implementing a 100% FOSS F-Droid build configuration alongside the Google variant, providing pure Android system GPS LocationManager with Open-Meteo geocoding, zero ads in FOSS mode, and generating both LloydsWeather-FOSS.apk and LloydsWeather-Google.apk for direct download.",
+  "updatedAt":  "2026-10-29T19:57:01.523011568Z",
   "requestFeedback":  true,
   "userFacing":  true
 }

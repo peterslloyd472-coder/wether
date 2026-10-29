@@ -103,6 +103,7 @@ fun WeatherDashboardScreen(
     val unit by viewModel.unitPreference.collectAsStateWithLifecycle()
     val themeMode by viewModel.themeMode.collectAsStateWithLifecycle()
     val provider by viewModel.weatherProvider.collectAsStateWithLifecycle()
+    val appEdition by viewModel.appEdition.collectAsStateWithLifecycle()
 
     val userSession by viewModel.userSession.collectAsStateWithLifecycle()
     val isAdFree by viewModel.isAdFree.collectAsStateWithLifecycle()
@@ -143,6 +144,7 @@ fun WeatherDashboardScreen(
                 FavoritesDrawerContent(
                     favorites = favorites,
                     activeProvider = provider,
+                    appEdition = appEdition,
                     userSession = userSession,
                     onOpenAuthOrProfile = {
                         scope.launch {
@@ -200,11 +202,26 @@ fun WeatherDashboardScreen(
                     title = {
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             Text(
-                                text = "Atmosphere",
+                                text = "Lloyds Weather",
                                 style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold)
                             )
+                            Spacer(modifier = Modifier.width(6.dp))
+                            Box(
+                                modifier = Modifier
+                                    .clip(RoundedCornerShape(6.dp))
+                                    .background(if (appEdition.isFoss) Color(0xFFD1FAE5) else Color(0xFFE0F2FE))
+                                    .clickable { showSettingsDialog = true }
+                                    .padding(horizontal = 6.dp, vertical = 2.dp)
+                            ) {
+                                Text(
+                                    text = if (appEdition.isFoss) "FOSS" else "GOOGLE",
+                                    fontSize = 9.sp,
+                                    fontWeight = FontWeight.Black,
+                                    color = if (appEdition.isFoss) Color(0xFF059669) else Color(0xFF0284C7)
+                                )
+                            }
                             if (isAdmin) {
-                                Spacer(modifier = Modifier.width(6.dp))
+                                Spacer(modifier = Modifier.width(4.dp))
                                 Box(
                                     modifier = Modifier
                                         .clip(RoundedCornerShape(6.dp))
@@ -439,11 +456,13 @@ fun WeatherDashboardScreen(
 
     if (showSettingsDialog) {
         SettingsDialog(
+            currentEdition = appEdition,
             currentUnit = unit,
             currentTheme = themeMode,
             currentProvider = provider,
             initialOpenWeatherKey = viewModel.getOpenWeatherKey(),
             initialWeatherApiKey = viewModel.getWeatherApiKey(),
+            onEditionChange = { viewModel.setAppEdition(it) },
             onSaveSettings = { newUnit, newTheme, newProvider, owmKey, weatherApiKey ->
                 viewModel.setTemperatureUnit(newUnit)
                 viewModel.setThemeMode(newTheme)

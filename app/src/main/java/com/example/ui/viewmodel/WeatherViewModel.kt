@@ -8,6 +8,7 @@ import com.example.data.local.FavoriteCityEntity
 import com.example.data.local.UserAuthManager
 import com.example.data.local.UserPreferences
 import com.example.data.repository.WeatherRepository
+import com.example.model.AppEdition
 import com.example.model.GeoSearchResult
 import com.example.model.TemperatureUnit
 import com.example.model.ThemeMode
@@ -51,14 +52,19 @@ class WeatherViewModel(
     val unitPreference: StateFlow<TemperatureUnit> = userPreferences.unitFlow
     val themeMode: StateFlow<ThemeMode> = userPreferences.themeFlow
     val weatherProvider: StateFlow<WeatherProvider> = userPreferences.providerFlow
+    val appEdition: StateFlow<AppEdition> = userPreferences.editionFlow
 
     val userSession: StateFlow<UserSession?> = userAuthManager.currentUser
     val globalAdBypass: StateFlow<Boolean> = userAuthManager.globalAdBypass
 
-    // Ad is completely removed if user is signed in OR if admin enabled global ad bypass
-    val isAdFree: StateFlow<Boolean> = combine(userSession, globalAdBypass) { session, bypass ->
-        session != null || bypass
-    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), userAuthManager.currentUser.value != null || userAuthManager.globalAdBypass.value)
+    // Ad is completely removed if running FOSS Edition OR user is signed in OR admin bypass enabled
+    val isAdFree: StateFlow<Boolean> = combine(userSession, globalAdBypass, appEdition) { session, bypass, edition ->
+        edition.isFoss || session != null || bypass
+    }.stateIn(
+        viewModelScope,
+        SharingStarted.WhileSubscribed(5000),
+        userPreferences.editionFlow.value.isFoss || userAuthManager.currentUser.value != null || userAuthManager.globalAdBypass.value
+    )
 
     val isAdmin: StateFlow<Boolean> = userSession.map { it?.isAdmin == true }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), userAuthManager.currentUser.value?.isAdmin == true)
@@ -147,7 +153,8 @@ class WeatherViewModel(
     fun loadCurrentLocation(context: Context) {
         viewModelScope.launch {
             _uiState.value = WeatherUiState.Loading
-            val deviceLocation = LocationHelper.getCurrentLocation(context)
+            val isFoss = appEdition.value.isFoss
+            val deviceLocation = LocationHelper.getCurrentLocation(context, isFossEdition = isFoss)
             if (deviceLocation != null) {
                 loadWeather(
                     lat = deviceLocation.latitude,
@@ -207,6 +214,10 @@ class WeatherViewModel(
         viewModelScope.launch {
             repository.removeFavoriteById(city.id)
         }
+    }
+
+    fun setAppEdition(edition: AppEdition) {
+        userPreferences.setEdition(edition)
     }
 
     fun setTemperatureUnit(unit: TemperatureUnit) {

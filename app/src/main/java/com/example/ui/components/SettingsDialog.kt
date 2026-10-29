@@ -32,17 +32,20 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
+import com.example.model.AppEdition
 import com.example.model.TemperatureUnit
 import com.example.model.ThemeMode
 import com.example.model.WeatherProvider
 
 @Composable
 fun SettingsDialog(
+    currentEdition: AppEdition,
     currentUnit: TemperatureUnit,
     currentTheme: ThemeMode,
     currentProvider: WeatherProvider,
     initialOpenWeatherKey: String,
     initialWeatherApiKey: String,
+    onEditionChange: (AppEdition) -> Unit,
     onSaveSettings: (
         unit: TemperatureUnit,
         theme: ThemeMode,
@@ -52,6 +55,7 @@ fun SettingsDialog(
     ) -> Unit,
     onDismiss: () -> Unit
 ) {
+    var selectedEdition by remember { mutableStateOf(currentEdition) }
     var selectedUnit by remember { mutableStateOf(currentUnit) }
     var selectedTheme by remember { mutableStateOf(currentTheme) }
     var selectedProvider by remember { mutableStateOf(currentProvider) }
@@ -80,6 +84,44 @@ fun SettingsDialog(
                 )
 
                 Spacer(modifier = Modifier.height(18.dp))
+
+                // Application Edition (F-Droid FOSS vs Google)
+                Text(
+                    text = "APPLICATION EDITION",
+                    style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Bold),
+                    color = MaterialTheme.colorScheme.secondary
+                )
+                Spacer(modifier = Modifier.height(6.dp))
+
+                AppEdition.entries.forEach { edition ->
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clip(RoundedCornerShape(8.dp))
+                            .clickable { selectedEdition = edition }
+                            .padding(vertical = 4.dp)
+                    ) {
+                        RadioButton(
+                            selected = selectedEdition == edition,
+                            onClick = { selectedEdition = edition }
+                        )
+                        Spacer(modifier = Modifier.width(6.dp))
+                        Column {
+                            Text(
+                                text = edition.displayName,
+                                style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.SemiBold)
+                            )
+                            Text(
+                                text = edition.tagline,
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.secondary
+                            )
+                        }
+                    }
+                }
+
+                HorizontalDivider(modifier = Modifier.padding(vertical = 14.dp), color = MaterialTheme.colorScheme.outline.copy(alpha = 0.25f))
 
                 // Temperature Units
                 Text(
@@ -210,6 +252,7 @@ fun SettingsDialog(
                     Spacer(modifier = Modifier.width(8.dp))
                     Button(
                         onClick = {
+                            onEditionChange(selectedEdition)
                             onSaveSettings(
                                 selectedUnit,
                                 selectedTheme,
