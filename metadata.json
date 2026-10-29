@@ -1,0 +1,6 @@
+{
+  "name": "Atmosphere",
+  "description": "Clean minimalist weather dashboard with 5-day forecast, multi-provider weather APIs, GPS location, favorites drawer, and tablet mode.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
